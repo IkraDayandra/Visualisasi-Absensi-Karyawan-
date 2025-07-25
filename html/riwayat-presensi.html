@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Presensi - Dashboard Keterlambatan</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <!-- Dashboard Layout -->
+    <div class="dashboard-layout" id="dashboardLayout">
+        <!-- Fixed Navbar -->
+        <nav class="navbar" id="navbar">
+            <div class="nav-container">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <div class="hamburger">
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                    </div>
+                </button>
+                <div class="profile-picture">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Fixed Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-chart-line"></i> Dashboard</h3>
+                <p>Keterlambatan System</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('home.html')">
+                        <i class="fas fa-home"></i> Home
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('dashboard.html')">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn active" onclick="showPage('attendance-history')">
+                        <i class="fas fa-history"></i> Riwayat Presensi
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('rekap-presensi.html')">
+                        <i class="fas fa-calendar-check"></i> Rekap Presensi
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="toggleSubmenu('visitor')">
+                        <i class="fas fa-users"></i> Riwayat Tamu
+                        <i class="fas fa-chevron-down submenu-icon"></i>
+                    </button>
+                    <ul class="submenu" id="visitor-submenu">
+                        <li>
+                            <button class="sidebar-btn" onclick="navigateToPage('riwayat-tamu.html?view=infografis')">
+                                <i class="fas fa-chart-line"></i> Infografis
+                            </button>
+                        </li>
+                        <li>
+                            <button class="sidebar-btn" onclick="navigateToPage('riwayat-tamu.html?view=rekapitulasi')">
+                                <i class="fas fa-table"></i> Rekapitulasi
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('admin.html')">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- Main Content Area -->
+        <div class="main-content" id="mainContent">
+            <!-- Attendance History Page -->
+            <div class="page active" id="attendance-history-page">
+                <div class="page-header">
+                    <h1 class="page-title"><i class="fas fa-history"></i> Riwayat Presensi</h1>
+                    <p class="page-subtitle">Data Kehadiran dan Keterlambatan Karyawan</p>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <i class="fas fa-table"></i> Data Riwayat Presensi
+                    </div>
+                    <div class="table-filters">
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select id="statusFilter" onchange="filterAttendanceHistory()">
+                                <option value="">Semua Status</option>
+                                <option value="late">Terlambat</option>
+                                <option value="ontime">Tepat Waktu</option>
+                                <option value="absent">Tidak Hadir</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Departemen</label>
+                            <select id="departmentFilterHistory" onchange="filterAttendanceHistory()">
+                                <option value="">Semua Departemen</option>
+                                <option value="IT">IT</option>
+                                <option value="HR">HR</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Operations">Operations</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Tanggal</label>
+                            <input type="date" id="dateFilterHistory" onchange="filterAttendanceHistory()">
+                        </div>
+                        <button class="filter-btn" onclick="filterAttendanceHistory()">
+                            <i class="fas fa-search"></i> Filter
+                        </button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Tanggal</th>
+                                    <th>Nama</th>
+                                    <th>ID Karyawan</th>
+                                    <th>Departemen</th>
+                                    <th>Jam Masuk</th>
+                                    <th>Jadwal</th>
+                                    <th>Keterlambatan</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceHistoryTableBody">
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-container">
+                        <div id="paginationInfo" class="pagination-info">
+                            Menampilkan 1-10 dari 126 data
+                        </div>
+                        <div class="pagination-controls">
+                            <button id="prevPageBtn" class="pagination-btn" onclick="changePage('prev')">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <button id="nextPageBtn" class="pagination-btn" onclick="changePage('next')">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- End Main Content -->
+    </div> <!-- End Dashboard Layout -->
+
+    <script src="../js/riwayat-presensi.js"></script>
+    <script src="../js/shared.js"></script>
+</body>
+</html>

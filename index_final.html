@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Keterlambatan - Peruri</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-page" id="loginPage">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="assets/logo_p.png" alt="Logo Peruri" class="login-logo-image">
+                <h1 class="login-title">Dashboard Karyawan</h1>
+                <p class="login-subtitle">Sistem Monitoring Kehadiran Karyawan</p>
+            </div>
+            
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Masukkan username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Masukkan password" required>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Layout -->
+    <div class="dashboard-layout" id="dashboardLayout" style="display: none;">
+        <!-- Fixed Navbar -->
+        <nav class="navbar" id="navbar">
+            <div class="nav-container">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <div class="hamburger">
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                    </div>
+                </button>
+                <img src="assets/logo.png" alt="Logo" class="navbar-logo">
+                <div class="profile-picture">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Fixed Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-chart-line"></i> Dashboard</h3>
+                <p>Keterlambatan System</p>
+            </div>
+        <ul class="sidebar-menu">
+            <li>
+                <button class="sidebar-btn active" onclick="showPage('home')">
+                    <i class="fas fa-home"></i> Home
+                </button>
+            </li>
+            <li>
+                <button class="sidebar-btn" onclick="showPage('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+            </li>
+            <li>
+                <button class="sidebar-btn" onclick="showPage('attendance-history')">
+                    <i class="fas fa-history"></i> Riwayat Presensi
+                </button>
+            </li>
+            <li>
+                <button class="sidebar-btn" onclick="showPage('attendance-recap')">
+                    <i class="fas fa-calendar-check"></i> Rekap Presensi
+                </button>
+            </li>
+            <li>
+                <button class="sidebar-btn" onclick="toggleSubmenu('visitor')">
+                    <i class="fas fa-users"></i> Riwayat Tamu
+                    <i class="fas fa-chevron-down submenu-icon"></i>
+                </button>
+                <ul class="submenu" id="visitor-submenu">
+                    <li>
+                        <button class="sidebar-btn" onclick="showPage('visitor-infografis')">
+                            <i class="fas fa-chart-line"></i> Infografis
+                        </button>
+                    </li>
+                    <li>
+                        <button class="sidebar-btn" onclick="showPage('visitor-rekapitulasi')">
+                            <i class="fas fa-table"></i> Rekapitulasi
+                        </button>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <button class="sidebar-btn" onclick="showPage('admin')">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
+            </li>
+            <li>
+                <button class="sidebar-btn logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </li>
+            </ul>
+        </div>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- Home Menu Area -->
+        <div class="main-content" id="mainContent">        <!-- Home Page -->
+        <div class="page active" id="home-page">
+            <div class="home-content">
+                <div class="home-text-container">
+                    <h1 class="home-title">Sistem Informasi Keterlambatan Terintegrasi</h1>
+                    <h2 class="home-subtitle">Analisa Riwayat Tamu</h2>
+                    <div class="home-welcome">
+                        <p>Selamat datang di Dashboard Keterlambatan Peruri</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div class="page" id="dashboard-page">
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h1>
+                <p class="page-subtitle">Ringkasan Kehadiran dan Keterlambatan Karyawan Hari Ini</p>
+            </div>
+            
+            <div class="dashboard-content">
+                <!-- Top Row: 3 Charts -->
+                <div class="charts-grid-top">
+                    <div class="chart-container">
+                        <h3>Rekap Bulanan</h3>
+                        <div class="chart-canvas">
+                            <canvas id="monthlyRecapChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Distribusi Status</h3>
+                        <div class="chart-canvas">
+                            <canvas id="statusDistributionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container top-employees-container">
+                        <h3>Top 5 Sering Terlambat</h3>
+                        <div class="top-late-employees" id="topLateEmployees">
+                            <!-- Data will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Row: 2 Charts -->
+                <div class="charts-grid-bottom">
+                    <div class="chart-container">
+                        <h3>Trend Keterlambatan Minggu Ini</h3>
+                        <div class="chart-canvas">
+                            <canvas id="weekTrendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container attendance-container">
+                        <h3>Presensi Hari Ini</h3>
+                        <div class="attendance-filter">
+                            <select id="todayAttendanceFilter" onchange="filterTodayAttendance()">
+                                <option value="">Semua Status</option>
+                                <option value="ontime">Tepat Waktu</option>
+                                <option value="late">Terlambat</option>
+                                <option value="absent">Tidak Hadir</option>
+                            </select>
+                        </div>
+                        <div class="today-attendance-table">
+                            <table class="attendance-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>Departemen</th>
+                                        <th>Jam Masuk</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="todayAttendanceBody">
+                                    <!-- Data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance History Page -->
+        <div class="page" id="attendance-history-page">
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-history"></i> Riwayat Presensi</h1>
+                <p class="page-subtitle">Data Kehadiran dan Keterlambatan Karyawan</p>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-header">
+                    <i class="fas fa-table"></i> Data Riwayat Presensi
+                </div>
+                <div class="table-filters">
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="statusFilter" onchange="filterAttendanceHistory()">
+                            <option value="">Semua Status</option>
+                            <option value="late">Terlambat</option>
+                            <option value="ontime">Tepat Waktu</option>
+                            <option value="absent">Tidak Hadir</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Departemen</label>
+                        <select id="departmentFilterHistory" onchange="filterAttendanceHistory()">
+                            <option value="">Semua Departemen</option>
+                            <option value="IT">IT</option>
+                            <option value="HR">HR</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Operations">Operations</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Tanggal</label>
+                        <input type="date" id="dateFilterHistory" onchange="filterAttendanceHistory()">
+                    </div>
+                    <div class="filter-group">
+                        <button class="filter-btn secondary" onclick="clearFilters()">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Tanggal</th>
+                                <th>Nama</th>
+                                <th>ID Karyawan</th>
+                                <th>Departemen</th>
+                                <th>Jam Masuk</th>
+                                <th>Jadwal</th>
+                                <th>Keterlambatan</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceHistoryTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-container">
+                    <div id="paginationInfo" class="pagination-info">
+                        Menampilkan 1-10 dari 126 data
+                    </div>
+                    <div class="pagination-controls">
+                        <button id="prevPageBtn" class="pagination-btn" onclick="changePage('prev')">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <button id="nextPageBtn" class="pagination-btn" onclick="changePage('next')">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Recap Page -->
+        <div class="page" id="attendance-recap-page">
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-calendar-check"></i> Rekap Presensi</h1>
+                <p class="page-subtitle">Rekap Bulanan Kehadiran Karyawan</p>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-header">
+                    <i class="fas fa-calendar"></i> Filter Rekap Presensi
+                </div>
+                <div class="table-filters">
+                    <div class="filter-group">
+                        <label>Nama Pegawai</label>
+                        <input type="text" id="employeeNameSearch" placeholder="Cari nama pegawai..." onkeyup="searchEmployee()">
+                    </div>
+                    <div class="filter-group">
+                        <label>Bulan</label>
+                        <select id="monthFilter" onchange="filterRecap()">
+                            <option value="0">Januari</option>
+                            <option value="1">Februari</option>
+                            <option value="2">Maret</option>
+                            <option value="3">April</option>
+                            <option value="4">Mei</option>
+                            <option value="5">Juni</option>
+                            <option value="6" selected>Juli</option>
+                            <option value="7">Agustus</option>
+                            <option value="8">September</option>
+                            <option value="9">Oktober</option>
+                            <option value="10">November</option>
+                            <option value="11">Desember</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <h3 id="calendarTitle">Rekap Presensi - Juli 2025</h3>
+                    </div>
+                    <div class="attendance-calendar" id="attendanceCalendar">
+                        <!-- Calendar will be generated by JavaScript -->
+                    </div>
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <div class="legend-color present"></div>
+                            <span>Hadir</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color absent"></div>
+                            <span>Tidak Hadir</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color weekend"></div>
+                            <span>Hari Libur</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visitor Infografis Page -->
+        <div class="page" id="visitor-infografis-page">
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-chart-line"></i> Infografis Riwayat Tamu</h1>
+                <p class="page-subtitle">Analisis Visual Data Kunjungan Tamu</p>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-header">
+                    <i class="fas fa-filter"></i> Filter Data Pengunjung
+                </div>
+                <div class="table-filters">
+                    <div class="filter-group">
+                        <label>Divisi</label>
+                        <select id="visitorDivisionFilter" onchange="submitVisitorFilter()">
+                            <option value="">Pilih Divisi</option>
+                            <option value="sumber-daya-manusia">Sumber Daya Manusia</option>
+                            <option value="pengadaan-fasilitas">Pengadaan Fasilitas Umum</option>
+                            <option value="pengamanan-k3">Pengamanan K3 dan Lingkungan</option>
+                            <option value="sbu-currency">SBU Currency Solution</option>
+                            <option value="sbu-security">SBU High Security Solution</option>
+                            <option value="riset-pengembangan">Riset dan Pengembangan</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Bulan</label>
+                        <select id="visitorMonthFilter" onchange="submitVisitorFilter()">
+                            <option value="0">Januari</option>
+                            <option value="1">Februari</option>
+                            <option value="2">Maret</option>
+                            <option value="3">April</option>
+                            <option value="4">Mei</option>
+                            <option value="5">Juni</option>
+                            <option value="6" selected>Juli</option>
+                            <option value="7">Agustus</option>
+                            <option value="8">September</option>
+                            <option value="9">Oktober</option>
+                            <option value="10">November</option>
+                            <option value="11">Desember</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Tahun</label>
+                        <select id="visitorYearFilter" onchange="submitVisitorFilter()">
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <h3>Trend Kunjungan Tamu Harian</h3>
+                    <div class="chart-canvas">
+                        <canvas id="visitorTrendChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Distribusi Kunjungan per Divisi</h3>
+                    <div class="chart-canvas">
+                        <canvas id="visitorDivisionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visitor Rekapitulasi Page -->
+        <div class="page" id="visitor-rekapitulasi-page">
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-table"></i> Rekapitulasi Riwayat Tamu</h1>
+                <p class="page-subtitle">Data Lengkap Kunjungan Tamu</p>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-header">
+                    <i class="fas fa-filter"></i> Filter Data Visitor
+                </div>
+                <div class="table-filters">
+                    <div class="filter-group">
+                        <label>Divisi</label>
+                        <select id="visitorRekapDivisionFilter" onchange="submitVisitorRekapFilter()">
+                            <option value="">Pilih Divisi</option>
+                            <option value="sumber-daya-manusia">Sumber Daya Manusia</option>
+                            <option value="pengadaan-fasilitas">Pengadaan Fasilitas Umum</option>
+                            <option value="pengamanan-k3">Pengamanan K3 dan Lingkungan</option>
+                            <option value="sbu-currency">SBU Currency Solution</option>
+                            <option value="sbu-security">SBU High Security Solution</option>
+                            <option value="riset-pengembangan">Riset dan Pengembangan</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Bulan</label>
+                        <select id="visitorRekapMonthFilter" onchange="submitVisitorRekapFilter()">
+                            <option value="0">Januari</option>
+                            <option value="1">Februari</option>
+                            <option value="2">Maret</option>
+                            <option value="3">April</option>
+                            <option value="4">Mei</option>
+                            <option value="5">Juni</option>
+                            <option value="6" selected>Juli</option>
+                            <option value="7">Agustus</option>
+                            <option value="8">September</option>
+                            <option value="9">Oktober</option>
+                            <option value="10">November</option>
+                            <option value="11">Desember</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Tahun</label>
+                        <select id="visitorRekapYearFilter" onchange="submitVisitorRekapFilter()">
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Visitor</th>
+                                <th>NIK</th>
+                                <th>Divisi Tujuan</th>
+                                <th>Tanggal Kunjungan</th>
+                                <th>Jam Masuk</th>
+                                <th>Jam Keluar</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="visitorTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-container">
+                    <div id="visitorPaginationInfo" class="pagination-info">
+                        Menampilkan 1-10 dari 30 data
+                    </div>
+                    <div class="pagination-controls">
+                        <button id="visitorPrevPageBtn" class="pagination-btn" onclick="changeVisitorPage('prev')">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <button id="visitorNextPageBtn" class="pagination-btn" onclick="changeVisitorPage('next')">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Page -->
+        <div class="page" id="admin-page">
+            <div class="page-header">
+                <h1 class="page-title"><i class="fas fa-user-shield"></i> Admin</h1>
+                <p class="page-subtitle">Panel Administrasi Sistem</p>
+            </div>
+            
+            <div class="admin-placeholder">
+                <i class="fas fa-cog"></i>
+                <h3>Menu Admin belum tersedia</h3>
+                <p>Masih dalam Pengembangan doain aja jadi yaa</p>
+            </div>
+        </div>
+
+        </div> <!-- End Main Content -->
+
+    </div> <!-- End Dashboard Layout -->
+
+    <script src="index_final.js"></script>
+</body>
+</html>

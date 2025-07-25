@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Dashboard Keterlambatan</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Dashboard Layout -->
+    <div class="dashboard-layout active" id="dashboardLayout">
+        <!-- Fixed Navbar -->
+        <nav class="navbar" id="navbar">
+            <div class="nav-container">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <div class="hamburger">
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                    </div>
+                </button>
+                <img src="../assets/logo.png" alt="Logo" class="navbar-logo">
+                <div class="profile-picture">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Fixed Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-chart-line"></i> Dashboard</h3>
+                <p>Keterlambatan System</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('home.html')">
+                        <i class="fas fa-home"></i> Home
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn active" onclick="showPage('dashboard')">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('riwayat-presensi.html')">
+                        <i class="fas fa-history"></i> Riwayat Presensi
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('rekap-presensi.html')">
+                        <i class="fas fa-calendar-check"></i> Rekap Presensi
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="toggleSubmenu('visitor')">
+                        <i class="fas fa-users"></i> Riwayat Tamu
+                        <i class="fas fa-chevron-down submenu-icon"></i>
+                    </button>
+                    <ul class="submenu" id="visitor-submenu">
+                        <li>
+                            <button class="sidebar-btn" onclick="navigateToPage('riwayat-tamu.html?view=infografis')">
+                                <i class="fas fa-chart-line"></i> Infografis
+                            </button>
+                        </li>
+                        <li>
+                            <button class="sidebar-btn" onclick="navigateToPage('riwayat-tamu.html?view=rekapitulasi')">
+                                <i class="fas fa-table"></i> Rekapitulasi
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('admin.html')">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- Main Content Area -->
+        <div class="main-content" id="mainContent">
+            <!-- Dashboard Page -->
+            <div class="page active" id="dashboard-page">
+                <div class="page-header">
+                    <h1 class="page-title"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h1>
+                    <p class="page-subtitle">Ringkasan Kehadiran dan Keterlambatan Karyawan Hari Ini</p>
+                </div>
+                
+                <div class="dashboard-content">
+                    <!-- Top Row: 3 Charts -->
+                    <div class="charts-grid-top">
+                        <div class="chart-container">
+                            <h3>Rekap Bulanan</h3>
+                            <div class="chart-canvas">
+                                <canvas id="monthlyRecapChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Distribusi Status</h3>
+                            <div class="chart-canvas">
+                                <canvas id="statusDistributionChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-container top-employees-container">
+                            <h3>Top 5 Sering Terlambat</h3>
+                            <div class="top-late-employees" id="topLateEmployees">
+                                <!-- Data will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Row: 2 Charts -->
+                    <div class="charts-grid-bottom">
+                        <div class="chart-container">
+                            <h3>Trend Keterlambatan Minggu Ini</h3>
+                            <div class="chart-canvas">
+                                <canvas id="weekTrendChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-container attendance-container">
+                            <h3>Presensi Hari Ini</h3>
+                            <div class="attendance-filter">
+                                <select id="todayAttendanceFilter" onchange="filterTodayAttendance()">
+                                    <option value="">Semua Status</option>
+                                    <option value="ontime">Tepat Waktu</option>
+                                    <option value="late">Terlambat</option>
+                                    <option value="absent">Tidak Hadir</option>
+                                </select>
+                            </div>
+                            <div class="today-attendance-table">
+                                <table class="attendance-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>Departemen</th>
+                                            <th>Jam Masuk</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="todayAttendanceBody">
+                                        <!-- Data will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- End Main Content -->
+    </div> <!-- End Dashboard Layout -->
+
+    <script src="../js/dashboard.js"></script>
+    <script>
+        // Standalone dashboard - bypass authentication
+        // Initialize sidebar and navigation functions
+        let sidebarOpen = true;
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            if (window.innerWidth <= 768) {
+                sidebarOpen = !sidebarOpen;
+                if (sidebarOpen) {
+                    sidebar.classList.add('open');
+                    overlay.style.display = 'block';
+                } else {
+                    sidebar.classList.remove('open');
+                    overlay.style.display = 'none';
+                }
+            }
+        }
+        
+        function closeSidebar() {
+            if (window.innerWidth <= 768) {
+                sidebarOpen = false;
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('sidebarOverlay').style.display = 'none';
+            }
+        }
+        
+        function navigateToPage(page) {
+            window.location.href = page;
+        }
+        
+        function toggleSubmenu(menuId) {
+            const submenu = document.getElementById(menuId + '-submenu');
+            const icon = event.target.closest('button').querySelector('.submenu-icon');
+            
+            if (submenu.style.display === 'block') {
+                submenu.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                submenu.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+        
+        function logout() {
+            window.location.href = '../index_final.html';
+        }
+        
+        function filterTodayAttendance() {
+            // Placeholder function for attendance filtering
+            console.log('Filtering today attendance...');
+        }
+        
+        // Initialize dashboard data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize dashboard charts and content (same as index_final.html)
+            initOverviewCharts();
+        });
+        
+        // Overview Dashboard Charts (copied from dashboard.js)
+        function initOverviewCharts() {
+            console.log('Initializing overview charts...');
+            
+            try {
+                // Monthly Recap Bar Chart
+                const monthlyRecapCtx = document.getElementById('monthlyRecapChart');
+                if (monthlyRecapCtx) {
+                    window.monthlyRecapChart = new Chart(monthlyRecapCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul'],
+                            datasets: [{
+                                label: 'Keterlambatan',
+                                data: [45, 52, 38, 67, 55, 48, 62],
+                                backgroundColor: '#e74c3c',
+                                borderRadius: 5,
+                                borderSkipped: false,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Status Distribution Pie Chart
+                const statusDistCtx = document.getElementById('statusDistributionChart');
+                if (statusDistCtx) {
+                    window.statusDistributionChart = new Chart(statusDistCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Hadir Tepat Waktu', 'Terlambat', 'Tidak Hadir'],
+                            datasets: [{
+                                data: [112, 23, 15],
+                                backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'],
+                                borderWidth: 2,
+                                borderColor: '#ffffff'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        fontSize: 12,
+                                        padding: 10
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Week Trend Chart
+                const weekCtx = document.getElementById('weekTrendChart');
+                if (weekCtx) {
+                    window.weekChart = new Chart(weekCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+                            datasets: [{
+                                label: 'Keterlambatan',
+                                data: [12, 18, 15, 23, 20, 8, 5],
+                                borderColor: '#e74c3c',
+                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Populate top 5 late employees
+                populateTopLateEmployees();
+                
+                // Populate today's attendance table
+                populateTodayAttendance();
+                
+            } catch (error) {
+                console.error('Error initializing overview charts:', error);
+            }
+        }
+        
+        function populateTopLateEmployees() {
+            const container = document.getElementById('topLateEmployees');
+            if (!container) return;
+
+            // Data yang sama dengan index_final.html
+            const topLateEmployees = [
+                { name: "Ahmad Suryadi", department: "IT", count: 12 },
+                { name: "Dewi Lestari", department: "Operations", count: 10 },
+                { name: "Budi Santoso", department: "Finance", count: 8 },
+                { name: "Fitri Ramadhani", department: "Finance", count: 7 },
+                { name: "Dwi Yuliawan", department: "Marketing", count: 6 }
+            ];
+
+            container.innerHTML = '';
+            
+            topLateEmployees.forEach((employee, index) => {
+                const div = document.createElement('div');
+                div.className = 'late-employee-item';
+                div.innerHTML = `
+                    <div class="employee-info">
+                        <div class="employee-rank">#${index + 1}</div>
+                        <div class="employee-details">
+                            <div class="employee-name">${employee.name}</div>
+                            <div class="employee-dept">${employee.department}</div>
+                        </div>
+                    </div>
+                    <div class="late-count">${employee.count}x</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function populateTodayAttendance() {
+            const tbody = document.getElementById('todayAttendanceBody');
+            if (!tbody) return;
+
+            // Data yang sama dengan index_final.html (sampleData)
+            const sampleData = [
+                { name: "Ahmad Suryadi", department: "IT", checkIn: "08:15", status: "late" },
+                { name: "Siti Rahayu", department: "HR", checkIn: "07:55", status: "ontime" },
+                { name: "Budi Santoso", department: "Finance", checkIn: "08:30", status: "late" },
+                { name: "Maya Indira", department: "Marketing", checkIn: "07:50", status: "ontime" },
+                { name: "Rizki Pratama", department: "IT", checkIn: "-", status: "absent" },
+                { name: "Dewi Lestari", department: "Operations", checkIn: "08:45", status: "late" },
+                { name: "Andi Wijaya", department: "HR", checkIn: "07:58", status: "ontime" },
+                { name: "Fitri Ramadhani", department: "Finance", checkIn: "08:20", status: "late" },
+                { name: "Mukti Raharja", department: "IT", checkIn: "07:50", status: "ontime" },
+                { name: "Yusri Mangunkusumo", department: "HR", checkIn: "08:10", status: "late" },
+                { name: "Andi Prahoro", department: "Finance", checkIn: "07:55", status: "ontime" },
+                { name: "Dwi Yuliawan", department: "Marketing", checkIn: "08:25", status: "late" },
+                { name: "Nur Cahyo", department: "Operations", checkIn: "08:20", status: "late" },
+                { name: "Septian Pamungkas", department: "IT", checkIn: "07:45", status: "ontime" },
+                { name: "Mulyani", department: "HR", checkIn: "08:15", status: "late" }
+            ];
+            
+            tbody.innerHTML = '';
+            
+            // Limit to first 15 for display
+            const todayAttendance = sampleData.slice(0, 15);
+            
+            todayAttendance.forEach((employee, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${employee.name}</td>
+                    <td>${employee.department}</td>
+                    <td>${employee.checkIn === '-' ? '-' : employee.checkIn}</td>
+                    <td><span class="status-badge status-${employee.status}">${getStatusText(employee.status)}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function getStatusText(status) {
+            switch(status) {
+                case 'ontime': return 'Tepat Waktu';
+                case 'late': return 'Terlambat';
+                case 'absent': return 'Tidak Hadir';
+                default: return status;
+            }
+        }
+        
+        function filterTodayAttendance() {
+            const filterValue = document.getElementById('todayAttendanceFilter').value;
+            const tbody = document.getElementById('todayAttendanceBody');
+            if (!tbody) return;
+
+            const sampleData = [
+                { name: "Ahmad Suryadi", department: "IT", checkIn: "08:15", status: "late" },
+                { name: "Siti Rahayu", department: "HR", checkIn: "07:55", status: "ontime" },
+                { name: "Budi Santoso", department: "Finance", checkIn: "08:30", status: "late" },
+                { name: "Maya Indira", department: "Marketing", checkIn: "07:50", status: "ontime" },
+                { name: "Rizki Pratama", department: "IT", checkIn: "-", status: "absent" },
+                { name: "Dewi Lestari", department: "Operations", checkIn: "08:45", status: "late" },
+                { name: "Andi Wijaya", department: "HR", checkIn: "07:58", status: "ontime" },
+                { name: "Fitri Ramadhani", department: "Finance", checkIn: "08:20", status: "late" },
+                { name: "Mukti Raharja", department: "IT", checkIn: "07:50", status: "ontime" },
+                { name: "Yusri Mangunkusumo", department: "HR", checkIn: "08:10", status: "late" },
+                { name: "Andi Prahoro", department: "Finance", checkIn: "07:55", status: "ontime" },
+                { name: "Dwi Yuliawan", department: "Marketing", checkIn: "08:25", status: "late" },
+                { name: "Nur Cahyo", department: "Operations", checkIn: "08:20", status: "late" },
+                { name: "Septian Pamungkas", department: "IT", checkIn: "07:45", status: "ontime" },
+                { name: "Mulyani", department: "HR", checkIn: "08:15", status: "late" }
+            ];
+            
+            tbody.innerHTML = '';
+            
+            // Apply filter if specified
+            let todayAttendance = [...sampleData];
+            if (filterValue) {
+                todayAttendance = todayAttendance.filter(employee => employee.status === filterValue);
+            }
+            
+            // Limit to first 15 for display
+            todayAttendance = todayAttendance.slice(0, 15);
+            
+            if (todayAttendance.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td colspan="5" style="text-align: center; padding: 20px; color: #6c757d;">
+                        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                        Tidak ada data untuk status yang dipilih
+                    </td>
+                `;
+                tbody.appendChild(tr);
+                return;
+            }
+            
+            todayAttendance.forEach((employee, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${employee.name}</td>
+                    <td>${employee.department}</td>
+                    <td>${employee.checkIn === '-' ? '-' : employee.checkIn}</td>
+                    <td><span class="status-badge status-${employee.status}">${getStatusText(employee.status)}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>

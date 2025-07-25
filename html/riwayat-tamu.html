@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Tamu - Dashboard Keterlambatan</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Dashboard Layout -->
+    <div class="dashboard-layout" id="dashboardLayout">
+        <!-- Fixed Navbar -->
+        <nav class="navbar" id="navbar">
+            <div class="nav-container">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <div class="hamburger">
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                    </div>
+                </button>
+                <div class="profile-picture">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Fixed Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-chart-line"></i> Dashboard</h3>
+                <p>Keterlambatan System</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('home.html')">
+                        <i class="fas fa-home"></i> Home
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('dashboard.html')">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('riwayat-presensi.html')">
+                        <i class="fas fa-history"></i> Riwayat Presensi
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('rekap-presensi.html')">
+                        <i class="fas fa-calendar-check"></i> Rekap Presensi
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn active" onclick="toggleSubmenu('visitor')">
+                        <i class="fas fa-users"></i> Riwayat Tamu
+                        <i class="fas fa-chevron-down submenu-icon"></i>
+                    </button>
+                    <ul class="submenu open" id="visitor-submenu">
+                        <li>
+                            <button class="sidebar-btn" onclick="showVisitorView('infografis')" id="infografis-btn">
+                                <i class="fas fa-chart-line"></i> Infografis
+                            </button>
+                        </li>
+                        <li>
+                            <button class="sidebar-btn" onclick="showVisitorView('rekapitulasi')" id="rekapitulasi-btn">
+                                <i class="fas fa-table"></i> Rekapitulasi
+                            </button>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <button class="sidebar-btn" onclick="navigateToPage('admin.html')">
+                        <i class="fas fa-user-shield"></i> Admin
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-btn logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- Main Content Area -->
+        <div class="main-content" id="mainContent">
+            <!-- Visitor Infografis Page -->
+            <div class="page" id="visitor-infografis-page">
+                <div class="page-header">
+                    <h1 class="page-title"><i class="fas fa-chart-line"></i> Infografis Riwayat Tamu</h1>
+                    <p class="page-subtitle">Analisis Visual Data Kunjungan Tamu</p>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <i class="fas fa-filter"></i> Filter Data Pengunjung
+                    </div>
+                    <div class="table-filters">
+                        <div class="filter-group">
+                            <label>Divisi</label>
+                            <select id="visitorDivisionFilter">
+                                <option value="">Pilih Divisi</option>
+                                <option value="sumber-daya-manusia">Sumber Daya Manusia</option>
+                                <option value="pengadaan-fasilitas">Pengadaan Fasilitas Umum</option>
+                                <option value="pengamanan-k3">Pengamanan K3 dan Lingkungan</option>
+                                <option value="sbu-currency">SBU Currency Solution</option>
+                                <option value="sbu-security">SBU High Security Solution</option>
+                                <option value="riset-pengembangan">Riset dan Pengembangan</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Bulan</label>
+                            <select id="visitorMonthFilter">
+                                <option value="0">Januari</option>
+                                <option value="1">Februari</option>
+                                <option value="2">Maret</option>
+                                <option value="3">April</option>
+                                <option value="4">Mei</option>
+                                <option value="5">Juni</option>
+                                <option value="6" selected>Juli</option>
+                                <option value="7">Agustus</option>
+                                <option value="8">September</option>
+                                <option value="9">Oktober</option>
+                                <option value="10">November</option>
+                                <option value="11">Desember</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Tahun</label>
+                            <select id="visitorYearFilter">
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                        <button class="filter-btn" onclick="submitVisitorFilter()">
+                            <i class="fas fa-search"></i> Submit
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3>Trend Kunjungan Tamu Harian</h3>
+                        <div class="chart-canvas">
+                            <canvas id="visitorTrendChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Distribusi Kunjungan per Divisi</h3>
+                        <div class="chart-canvas">
+                            <canvas id="visitorDivisionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visitor Rekapitulasi Page -->
+            <div class="page" id="visitor-rekapitulasi-page">
+                <div class="page-header">
+                    <h1 class="page-title"><i class="fas fa-table"></i> Rekapitulasi Riwayat Tamu</h1>
+                    <p class="page-subtitle">Data Lengkap Kunjungan Tamu</p>
+                </div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <i class="fas fa-filter"></i> Filter Data Visitor
+                    </div>
+                    <div class="table-filters">
+                        <div class="filter-group">
+                            <label>Divisi</label>
+                            <select id="visitorRekapDivisionFilter">
+                                <option value="">Pilih Divisi</option>
+                                <option value="sumber-daya-manusia">Sumber Daya Manusia</option>
+                                <option value="pengadaan-fasilitas">Pengadaan Fasilitas Umum</option>
+                                <option value="pengamanan-k3">Pengamanan K3 dan Lingkungan</option>
+                                <option value="sbu-currency">SBU Currency Solution</option>
+                                <option value="sbu-security">SBU High Security Solution</option>
+                                <option value="riset-pengembangan">Riset dan Pengembangan</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Bulan</label>
+                            <select id="visitorRekapMonthFilter">
+                                <option value="0">Januari</option>
+                                <option value="1">Februari</option>
+                                <option value="2">Maret</option>
+                                <option value="3">April</option>
+                                <option value="4">Mei</option>
+                                <option value="5">Juni</option>
+                                <option value="6" selected>Juli</option>
+                                <option value="7">Agustus</option>
+                                <option value="8">September</option>
+                                <option value="9">Oktober</option>
+                                <option value="10">November</option>
+                                <option value="11">Desember</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Tahun</label>
+                            <select id="visitorRekapYearFilter">
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                        <button class="filter-btn" onclick="submitVisitorRekapFilter()">
+                            <i class="fas fa-search"></i> Submit
+                        </button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Visitor</th>
+                                    <th>NIK</th>
+                                    <th>Divisi Tujuan</th>
+                                    <th>Tanggal Kunjungan</th>
+                                    <th>Jam Masuk</th>
+                                    <th>Jam Keluar</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="visitorTableBody">
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-container">
+                        <div id="visitorPaginationInfo" class="pagination-info">
+                            Menampilkan 1-10 dari 30 data
+                        </div>
+                        <div class="pagination-controls">
+                            <button id="visitorPrevPageBtn" class="pagination-btn" onclick="changeVisitorPage('prev')">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <button id="visitorNextPageBtn" class="pagination-btn" onclick="changeVisitorPage('next')">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- End Main Content -->
+    </div> <!-- End Dashboard Layout -->
+
+    <script src="../js/riwayat-tamu.js"></script>
+    <script src="../js/shared.js"></script>
+</body>
+</html>
