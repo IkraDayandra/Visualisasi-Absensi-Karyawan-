@@ -207,6 +207,9 @@ function handleLogin(event) {
     
     console.log('✅ Login state saved');
     
+    // Show login success notification
+    showNotification('Anda telah berhasil login', 'success');
+    
     // Hide login page and show dashboard
     showDashboard();
 }
@@ -1692,14 +1695,21 @@ function changeVisitorPage(direction) {
 
 function submitVisitorRekapFilter() {
     const division = document.getElementById('visitorRekapDivisionFilter').value;
-    const month = document.getElementById('visitorRekapMonthFilter').value;
-    const year = document.getElementById('visitorRekapYearFilter').value;
+    const dateFilter = document.getElementById('visitorRekapDateFilter').value;
     
     // Filter visitor data based on criteria
     let filteredData = [...visitorData];
     
     if (division) {
         filteredData = filteredData.filter(visitor => visitor.division === division);
+    }
+    
+    if (dateFilter) {
+        // Convert date to dd/mm/yyyy format for comparison
+        const filterDate = new Date(dateFilter);
+        const filterDateString = `${filterDate.getDate().toString().padStart(2, '0')}/${(filterDate.getMonth() + 1).toString().padStart(2, '0')}/${filterDate.getFullYear()}`;
+        
+        filteredData = filteredData.filter(visitor => visitor.date === filterDateString);
     }
     
     // Update global visitor data
@@ -1710,6 +1720,21 @@ function submitVisitorRekapFilter() {
     populateVisitorRekapitulasi();
     
     showNotification('Filter visitor berhasil diterapkan!', 'success');
+}
+
+function clearVisitorFilters() {
+    // Clear all filter inputs
+    document.getElementById('visitorRekapDivisionFilter').value = '';
+    document.getElementById('visitorRekapDateFilter').value = '';
+    
+    // Reset to original data
+    window.allVisitorData = [...visitorData];
+    window.visitorCurrentPage = 1;
+    
+    // Refresh table
+    populateVisitorRekapitulasi();
+    
+    showNotification('Filter visitor berhasil dihapus!', 'info');
 }
 
 function getDivisionName(divisionCode) {

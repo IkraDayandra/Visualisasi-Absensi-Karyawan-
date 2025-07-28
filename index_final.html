@@ -428,29 +428,13 @@
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>Bulan</label>
-                        <select id="visitorRekapMonthFilter" onchange="submitVisitorRekapFilter()">
-                            <option value="0">Januari</option>
-                            <option value="1">Februari</option>
-                            <option value="2">Maret</option>
-                            <option value="3">April</option>
-                            <option value="4">Mei</option>
-                            <option value="5">Juni</option>
-                            <option value="6" selected>Juli</option>
-                            <option value="7">Agustus</option>
-                            <option value="8">September</option>
-                            <option value="9">Oktober</option>
-                            <option value="10">November</option>
-                            <option value="11">Desember</option>
-                        </select>
+                        <label>Tanggal</label>
+                        <input type="date" id="visitorRekapDateFilter" onchange="submitVisitorRekapFilter()">
                     </div>
                     <div class="filter-group">
-                        <label>Tahun</label>
-                        <select id="visitorRekapYearFilter" onchange="submitVisitorRekapFilter()">
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                        </select>
+                        <button class="filter-btn secondary" onclick="clearVisitorFilters()">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
                     </div>
                 </div>
                 <div class="table-wrapper">
