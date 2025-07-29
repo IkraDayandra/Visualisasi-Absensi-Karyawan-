@@ -208,7 +208,7 @@ function handleLogin(event) {
     console.log('✅ Login state saved');
     
     // Show login success notification
-    showNotification('Anda telah berhasil login', 'success');
+    showNotification('Anda telah berhasil Masuk', 'success');
     
     // Hide login page and show dashboard
     showDashboard();
@@ -394,7 +394,7 @@ function logout() {
         loginPage.style.display = 'flex';
     }
     
-    showNotification('Anda telah berhasil logout', 'info');
+    showNotification('Anda telah berhasil Keluar', 'info');
 }
 
 function checkLoginState() {
