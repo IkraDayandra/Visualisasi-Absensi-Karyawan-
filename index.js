@@ -816,6 +816,29 @@ function showPage(pageName) {
         console.log('✅ Added active class to button');
     }
     
+    // Auto-close visitor submenu when switching to other pages
+    if (pageName !== 'visitor-infografis' && pageName !== 'visitor-rekapitulasi') {
+        const visitorSubmenu = document.getElementById('visitor-submenu');
+        const visitorButton = document.querySelector('[onclick="toggleSubmenu(\'visitor\')"]');
+        const visitorIcon = document.querySelector('[onclick="toggleSubmenu(\'visitor\')"] .submenu-icon');
+        if (visitorSubmenu && visitorButton && visitorIcon) {
+            visitorSubmenu.classList.remove('open');
+            visitorButton.classList.remove('submenu-open');
+            visitorIcon.style.transform = 'rotate(0deg)';
+        }
+    }
+    
+    // Reset scroll to top for all pages
+    const mainContent = document.getElementById('mainContent');
+    if (mainContent) {
+        mainContent.scrollTop = 0;
+    }
+    
+    // Also reset scroll for the target page itself
+    if (targetPage) {
+        targetPage.scrollTop = 0;
+    }
+    
     // Close sidebar on mobile after selection
     closeSidebarOnMobile();
     

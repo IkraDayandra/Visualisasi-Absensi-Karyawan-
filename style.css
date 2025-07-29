@@ -316,7 +316,7 @@ button.menu-toggle .hamburger .line {
     top: 0;
     width: 280px;
     height: 100vh;
-    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
     color: white;
     z-index: 1000;
     overflow-y: auto;
@@ -383,10 +383,10 @@ button.menu-toggle .hamburger .line {
 
 .sidebar-btn:hover,
 .sidebar-btn.active {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     padding-left: 30px;
-    border-left: 4px solid rgba(255, 255, 255, 0.5);
+    border-left: 4px solid rgba(255, 255, 255, 0.8);
 }
 
 .submenu {
@@ -394,7 +394,7 @@ button.menu-toggle .hamburger .line {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .submenu.open {
@@ -432,6 +432,10 @@ button.menu-toggle .hamburger .line {
 }
 
 .sidebar-btn:hover .submenu-icon {
+    transform: rotate(180deg);
+}
+
+.sidebar-btn.submenu-open .submenu-icon {
     transform: rotate(180deg);
 }
 
