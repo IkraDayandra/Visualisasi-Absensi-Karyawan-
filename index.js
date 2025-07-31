@@ -89,6 +89,9 @@ window.addEventListener('resize', function() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, checking login state...');
     
+    // Reset scroll position on page load
+    resetScrollPosition();
+    
     // Check if already logged in
     const isLoggedIn = sessionStorage.getItem('isLoggedIn');
     if (isLoggedIn === 'true') {
@@ -104,6 +107,50 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Initial sidebar state:', sidebarOpen);
 });
+
+// Function to reset scroll position
+function resetScrollPosition() {
+    // Immediate scroll reset
+    performScrollReset();
+    
+    // Additional reset with small delay to ensure all elements are rendered
+    setTimeout(performScrollReset, 10);
+    setTimeout(performScrollReset, 50);
+}
+
+function performScrollReset() {
+    // Reset main content scroll
+    const mainContent = document.getElementById('mainContent');
+    if (mainContent) {
+        mainContent.scrollTop = 0;
+        mainContent.scrollLeft = 0;
+    }
+    
+    // Reset window scroll
+    window.scrollTo(0, 0);
+    
+    // Reset all page containers scroll
+    document.querySelectorAll('.page').forEach(page => {
+        page.scrollTop = 0;
+        page.scrollLeft = 0;
+    });
+    
+    // Reset any scrollable containers
+    document.querySelectorAll('.table-wrapper, .chart-container, .dashboard-content, .table-container').forEach(container => {
+        container.scrollTop = 0;
+        container.scrollLeft = 0;
+    });
+    
+    // Reset body scroll
+    if (document.body) {
+        document.body.scrollTop = 0;
+    }
+    
+    // Reset document element scroll
+    if (document.documentElement) {
+        document.documentElement.scrollTop = 0;
+    }
+}
 
 // Sample data
 const sampleData = [
@@ -223,6 +270,9 @@ function showDashboard() {
     console.log('🔍 Login page element:', loginPage);
     console.log('🔍 Dashboard layout element:', dashboardLayout);
     console.log('🔍 Navbar element:', navbar);
+    
+    // Reset scroll position when showing dashboard
+    resetScrollPosition();
     
     // Update global login state
     isLoggedIn = true;
@@ -828,16 +878,8 @@ function showPage(pageName) {
         }
     }
     
-    // Reset scroll to top for all pages
-    const mainContent = document.getElementById('mainContent');
-    if (mainContent) {
-        mainContent.scrollTop = 0;
-    }
-    
-    // Also reset scroll for the target page itself
-    if (targetPage) {
-        targetPage.scrollTop = 0;
-    }
+    // Reset scroll to top for all pages - Enhanced version
+    resetScrollPosition();
     
     // Close sidebar on mobile after selection
     closeSidebarOnMobile();
